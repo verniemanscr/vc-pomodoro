@@ -2,7 +2,7 @@
     "name": "Pomodoro Timer",
     "short_name": "Pomodoro",
     "description": "A simple Pomodoro timer that helps you focus with 25-minute work sessions and 5-minute breaks.",
-    "start_url": "/index.html",
+    "start_url": "index.html",
     "scope": "/",
     "display": "standalone",
     "background_color": "#f0f8ff",
