@@ -1,6 +1,7 @@
 // Timer variables
 let workDuration = 25 * 60; // 25 minutes in seconds
 let restDuration = 5 * 60; // 5 minutes in seconds
+let longRestDuration = 15 * 60; // 15 minutes in seconds
 let remainingTime = workDuration;
 let isPaused = true;
 let isWorking = true;
@@ -37,13 +38,13 @@ function updateTimer() {
         
         // Update visual feedback
         if (!isWorking) {
-            vistaBg.style.filter = 'blur(5px) grayscale(0.6) brightness(0.5)';
+            vistaBg.style.filter = 'blur(5px) grayscale(0.6) brightness(0.8)';
             completedBlocks++;
             completedBlocksDisplay.textContent = `Blocks: ${completedBlocks}`;
             
-            // Check if we need a long break (every 4 blocks)
-            if (completedBlocks % 4 === 0) {
-                // Show long break notification
+            // Check if we need a long break (every 3 blocks)
+            if (completedBlocks % 3 === 0) {
+                remainingTime = longRestDuration;
                 alert(`🎉 Long break time! Take a 15-minute break!`);
             }
         } else {
@@ -74,33 +75,22 @@ startPauseBtn.addEventListener('click', () => {
 
 // Skip current block
 skipBtn.addEventListener('click', () => {
-    if (isWorking) {
-        // Skip work block
-        isWorking = false;
-        remainingTime = restDuration;
-        vistaBg.style.filter = 'blur(5px) grayscale(0.6) brightness(0.5)';
+    isWorking = !isWorking;
+    remainingTime = isWorking ? workDuration : restDuration;
+    
+    if (!isWorking) {
         completedBlocks++;
         completedBlocksDisplay.textContent = `Blocks: ${completedBlocks}`;
         
-        // Check if we need a long break (every 4 blocks)
-        if (completedBlocks % 4 === 0) {
-            // Show long break notification
+        // Check if we need a long break (every 3 blocks)
+        if (completedBlocks % 3 === 0) {
+            remainingTime = longRestDuration;
             alert(`🎉 Long break time! Take a 15-minute break!`);
         }
-        
-        startPauseBtn.textContent = 'Pause';
-        intervalId = setInterval(updateTimer, 1000);
-    } else {
-        // Skip break block
-        isWorking = true;
-        remainingTime = workDuration;
-        vistaBg.style.filter = 'blur(0px) grayscale(0) brightness(1)';
-        completedBlocks++;
-        completedBlocksDisplay.textContent = `Blocks: ${completedBlocks}`;
-        
-        startPauseBtn.textContent = 'Pause';
-        intervalId = setInterval(updateTimer, 1000);
     }
+
+    startPauseBtn.textContent = 'Pause';
+    intervalId = setInterval(updateTimer, 1000);
 });
 
 // Initialize timer
@@ -113,19 +103,6 @@ window.onload = () => {
     // Set initial background
     vistaBg.style.filter = 'blur(0px) grayscale(0) brightness(1)';
 };
-
-// Add PWA functionality
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-                console.log('Service Worker registered:', registration);
-            })
-            .catch(error => {
-                console.log('Service Worker registration failed:', error);
-            });
-    });
-}
 
 // Make sure we handle window close to avoid memory leaks
 window.addEventListener('beforeunload', () => {
