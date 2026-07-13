@@ -1,11 +1,11 @@
 const CACHE_NAME = 'pomodoro-v1';
 const ASSETS_TO_CACHE = [
-    '/vc-pomodoro/index.html', // No trailing slash for file
-    '/vc-pomodoro/style.css',  // No trailing slash for file
-    '/vc-pomodoro/main.js',    // No trailing slash for file
-    '/vc-pomodoro/manifest.json', // No trailing slash for file
-    '/vc-pomodoro/icon-192.png',   // No trailing slash for file
-    '/vc-pomodoro/icon-512.png'    // No trailing slash for file
+    'index.html', // No trailing slash for file
+    'style.css',  // No trailing slash for file
+    'main.js',    // No trailing slash for file
+    'manifest.json', // No trailing slash for file
+    'icon-192.png',   // No trailing slash for file
+    'icon-512.png'    // No trailing slash for file
 ];
 
 // Install event - cache the app shell
