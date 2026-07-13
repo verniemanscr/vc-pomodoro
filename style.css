@@ -9,7 +9,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #f0f8ff;
+    background-color: #f0f8ff; /* Light blue background */
     font-family: 'Roboto', sans-serif;
     color: #333;
 }
@@ -35,18 +35,23 @@ body {
     margin: 0 auto;
 }
 
-.circle-background {
+.circle-background,
+.circle-progress {
     fill: none;
-    stroke: #ddd;
     stroke-width: 8;
+    transform: rotate(-90deg); /* Start at the top */
+    transform-origin: center;
+}
+
+.circle-background {
+    stroke: #ddd;
+    stroke-dasharray: 282.7; /* Circumference of the circle */
+    stroke-dashoffset: 0;
 }
 
 .circle-progress {
-    fill: none;
     stroke: #6a11cb;
-    stroke-width: 8;
-    transform: rotate(-90deg);
-    transform-origin: center;
+    transition: stroke-dashoffset 0.5s ease-out;
 }
 
 #timer-time {
@@ -56,6 +61,8 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    pointer-events: none; /* Prevent text selection */
+    fill: #333; /* Ensure text color is visible */
 }
 
 .controls {
@@ -88,6 +95,8 @@ body {
 
 .stats {
     font-size: 14px;
+    margin-top: 10px;
+    color: #333; /* Ensure text color is visible */
 }
 
 /* Install Button Styling */
@@ -95,4 +104,14 @@ body {
     padding: 10px 20px;
     font-size: 14px;
     margin-top: 20px;
+    background-color: #6a11cb;
+    border: none;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.install-btn:hover {
+    background-color: #5282e5;
 }
