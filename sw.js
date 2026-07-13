@@ -4,8 +4,8 @@ const ASSETS_TO_CACHE = [
     '/index.html',
     '/style.css',
     '/manifest.json',
-    '/icons/icon-192.png',
-    '/icons/icon-512.png'
+    'icon-192.png',
+    'icon-512.png'
 ];
 
 // Install event - cache the app shell
