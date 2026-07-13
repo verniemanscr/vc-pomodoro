@@ -5,16 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pomodoro Timer</title>
     <!-- Manifest Link -->
-    <link rel="manifest" href="/manifest.json"> <!-- Ensure correct path -->
-    <link rel="stylesheet" href="/style.css"> <!-- Ensure correct path if not in root -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/manifest.json">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="/style.css">
+    <!-- Fontawesome for icons (optional) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div id="pomodoro-container">
+        <div id="timer-display">
+            <svg class="circle-timer" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" class="circle-background" />
+                <circle cx="50" cy="50" r="45" class="circle-progress" />
+                <text id="timer-time" x="50" y="50" text-anchor="middle" dy=".3em">25:00</text>
+            </svg>
+        </div>
+        <div class="controls">
+            <button id="start-pause-btn" class="btn">Start</button>
+            <button id="skip-btn" class="btn skip">Skip Block</button>
+        </div>
+        <div class="stats">
+            <p id="completed-blocks">Blocks: 0</p>
+        </div>
+    </div>
+
+    <!-- Install Button (hidden by default) -->
+    <div id="install-button-container" style="display:none;">
+        <button id="install-button" class="btn install-btn">
+            ⚡ Add to Home Screen
+        </button>
+    </div>
+
     <!-- Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')  // Ensure correct path to sw.js
+                navigator.serviceWorker.register('/sw.js')
                     .then(registration => {
                         console.log('Service Worker registered:', registration);
                     })
@@ -24,79 +50,8 @@
             });
         }
     </script>
-</head>
-<body>
-    <div id="vista-bg"></div>
-    <div id="pomodoro-container">
-        <div id="pomodoro-timer">
-            <div class="timer-progress-container">
-                <svg class="circle-timer" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" class="circle-background" />
-                    <text id="timer-time" x="50" y="50" text-anchor="middle" dy=".3em" font-size="24px" font-weight="bold">25:00</text>
-                </svg>
-            </div>
-            <div class="timer-controls">
-                <button id="start-pause-btn" class="btn">Start</button>
-                <button id="skip-btn" class="btn skip">Skip Block</button>
-            </div>
-            <div class="stats">
-                <p id="completed-blocks">Blocks: 0</p>
-            </div>
-        </div>
-    </div>
 
-    <div id="install-button-container">
-        <!-- Install button is hidden by default -->
-        <button id="install-button" class="install-btn" style="display:none;">
-            ⚡ Add to Home Screen
-        </button>
-    </div>
-
-    <script src="/main.js"></script> <!-- Ensure correct path if not in root -->
-
-    <script>
-        // Install Button Logic
-        let deferredPrompt;
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent the mini-infobar from appearing on mobile
-            e.preventDefault();
-            
-            // Stash the event so it can be triggered later.
-            deferredPrompt = e;
-            
-            // Update UI to notify the user they can add to home screen
-            const installButton = document.getElementById('install-button');
-            installButton.style.display = 'block';
-        });
-
-        const installButton = document.getElementById('install-button');
-        if (installButton) {
-            installButton.addEventListener('click', () => {
-                // Hide the app provided install promotion
-                installButton.style.display = 'none';
-                
-                // Show the install prompt
-                deferredPrompt.prompt();
-                
-                // Wait for the user to respond to the prompt
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the A2HS prompt');
-                    } else {
-                        console.log('User dismissed the A2HS prompt');
-                    }
-                    
-                    // Reset the deferred prompt variable
-                    deferredPrompt = null;
-                });
-            });
-        }
-
-        window.addEventListener('appinstalled', (evt) => {
-            console.log('INSTALL EVENT TRIGGERED!');
-        });
-
-    </script>
+    <!-- Main JavaScript -->
+    <script src="/main.js"></script>
 </body>
 </html>
