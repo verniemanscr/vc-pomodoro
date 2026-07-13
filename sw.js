@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pomodoro-v1';
+const CACHE_NAME = 'vc-pomodoro';
 const ASSETS_TO_CACHE = [
     'index.html', // No trailing slash for file
     'style.css',  // No trailing slash for file
