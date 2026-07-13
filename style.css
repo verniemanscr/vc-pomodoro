@@ -55,18 +55,15 @@ body {
 }
 
 .circle-background {
-    fill: #e0e0e0;
+    fill: none;
     stroke: #333;
     stroke-width: 10;
 }
 
-.circle-progress {
-    fill: none;
-    stroke: #6a11cb;
-    stroke-width: 10;
-    stroke-dasharray: 282.74;
-    stroke-dashoffset: 282.74;
-    transition: stroke-dashoffset 0.5s ease;
+#timer-time {
+    font-size: 24px;
+    font-weight: bold;
+    fill: white; /* Ensure text color is visible */
 }
 
 .timer-controls {
@@ -83,6 +80,8 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     font-family: inherit;
+    background-color: #fff;
+    color: #6a11cb;
 }
 
 .btn:hover {
@@ -95,17 +94,18 @@ body {
 }
 
 .skip {
-    background: #e0e0e0;
+    background-color: #e0e0e0;
     color: #333;
 }
 
 .skip:hover {
-    background: #d0d0d0;
+    background-color: #d0d0d0;
 }
 
 .stats {
     margin-top: 20px;
     font-size: 14px;
+    color: white; /* Ensure text color is visible */
 }
 
 @media (max-width: 480px) {
