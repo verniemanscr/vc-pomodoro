@@ -2,7 +2,7 @@
     "name": "Pomodoro Timer",
     "short_name": "Pomodoro",
     "description": "A simple Pomodoro timer that helps you focus with 25-minute work sessions and 5-minute breaks.",
-    "start_url": "/vc-pomodoro/", <!-- No trailing slash for file -->
+    "start_url": "index.html", <!-- No trailing slash for file -->
     "scope": "/", <!-- Trailing slash is correct for root directory -->
     "display": "standalone",
     "background_color": "#f0f8ff",
