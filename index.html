@@ -4,11 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pomodoro Timer</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
+    <!-- Manifest Link -->
+    <link rel="manifest" href="/manifest.json"> <!-- Ensure correct path -->
+    <link rel="stylesheet" href="/style.css"> <!-- Ensure correct path if not in root -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')  // Ensure correct path to sw.js
+                    .then(registration => {
+                        console.log('Service Worker registered:', registration);
+                    })
+                    .catch(error => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
 </head>
 <body>
     <div id="vista-bg"></div>
@@ -32,7 +47,8 @@
     </div>
 
     <div id="install-button-container">
-        <button id="install-button" class="install-btn">
+        <!-- Install button is hidden by default -->
+        <button id="install-button" class="install-btn" style="display:none;">
             ⚡ Add to Home Screen
         </button>
     </div>
@@ -78,7 +94,7 @@
                 
                 // Update visual feedback
                 if (!isWorking) {
-                    vistaBg.style.filter = 'blur(5px) grayscale(0.6) brightness(0.5)';
+                    vistaBg.style.filter = 'blur(5px) grayscale(0.6) brightness(0.8)'; // Slightly adjusted for better visibility
                     completedBlocks++;
                     completedBlocksDisplay.textContent = `Blocks: ${completedBlocks}`;
                     
@@ -151,92 +167,48 @@
             }
         });
 
-        // Custom install button
-        document.addEventListener('DOMContentLoaded', () => {
+        // Install Button Logic
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            
+            // Update UI to notify the user they can add to home screen
             const installButton = document.getElementById('install-button');
-            
-            if ('serviceWorker' in navigator) {
-                installButton.addEventListener('click', () => {
-                    if (navigator.serviceWorker.controller) {
-                        // If we have a service worker, we can install
-                        navigator.serviceWorker.ready.then(registration => {
-                            // Show the install prompt
-                            registration.active.postMessage({ type: 'install' });
-                        });
+            installButton.style.display = 'block';
+        });
+
+        const installButton = document.getElementById('install-button');
+        if (installButton) {
+            installButton.addEventListener('click', () => {
+                // Hide the app provided install promotion
+                installButton.style.display = 'none';
+                
+                // Show the install prompt
+                deferredPrompt.prompt();
+                
+                // Wait for the user to respond to the prompt
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the A2HS prompt');
                     } else {
-                        // If no service worker, we need to register one
-                        navigator.serviceWorker.register('sw.js').then(() => {
-                            // After registration, try again
-                            setTimeout(() => {
-                                installButton.click();
-                            }, 1000);
-                        });
+                        console.log('User dismissed the A2HS prompt');
                     }
+                    
+                    // Reset the deferred prompt variable
+                    deferredPrompt = null;
                 });
-            }
+            });
+        }
+
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('INSTALL EVENT TRIGGERED!');
         });
+
     </script>
-
-    <!-- Service Worker -->
-   <script>
-    // Service Worker registration (for browser detection)
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')  // Ensure correct path to sw.js
-                .then(registration => {
-                    console.log('Service Worker registered:', registration);
-                })
-                .catch(error => {
-                    console.error('Service Worker registration failed:', error);
-                });
-        });
-    }
-</script>
-
-
-    <!-- Manifest -->
-    <link rel="manifest" href="manifest.json">
-    
-    <script>
-    let deferredPrompt;
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent Chrome 67 and earlier from automatically showing the prompt
-        e.preventDefault();
-        
-        // Stash the event so it can be triggered later.
-        deferredPrompt = e;
-        
-        // Update UI to notify the user they can add to home screen
-        installButton.style.display = 'block';
-    });
-
-    const installButton = document.getElementById('install-button');
-    installButton.addEventListener('click', (e) => {
-        if (!deferredPrompt) return;
-        
-        // Hide the app provided install promotion
-        installButton.style.display = 'none';
-        
-        // Show the install prompt
-        deferredPrompt.prompt();
-        
-        // Wait for the user to respond to the prompt
-        deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted the A2HS prompt');
-            } else {
-                console.log('User dismissed the A2HS prompt');
-            }
-            
-            // Reset the deferred prompt variable
-            deferredPrompt = null;
-        });
-    });
-
-    window.addEventListener('appinstalled', (evt) => {
-        console.log('INSTALL EVENT TRIGGERED!');
-    });
-</script>
 </body>
 </html>
