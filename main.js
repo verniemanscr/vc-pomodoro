@@ -13,7 +13,6 @@ const timerTime = document.getElementById('timer-time');
 const startPauseBtn = document.getElementById('start-pause-btn');
 const skipBtn = document.getElementById('skip-btn');
 const completedBlocksDisplay = document.getElementById('completed-blocks');
-const vistaBg = document.getElementById('vista-bg');
 
 // Format time to MM:SS
 function formatTime(seconds) {
@@ -38,7 +37,6 @@ function updateTimer() {
         
         // Update visual feedback
         if (!isWorking) {
-            vistaBg.style.filter = 'blur(5px) grayscale(0.6) brightness(0.8)';
             completedBlocks++;
             completedBlocksDisplay.textContent = `Blocks: ${completedBlocks}`;
             
@@ -47,8 +45,6 @@ function updateTimer() {
                 remainingTime = longRestDuration;
                 alert(`🎉 Long break time! Take a 15-minute break!`);
             }
-        } else {
-            vistaBg.style.filter = 'blur(0px) grayscale(0) brightness(1)';
         }
 
         // Pause timer after reset
@@ -99,9 +95,6 @@ window.onload = () => {
     startPauseBtn.textContent = 'Start';
     timerTime.textContent = formatTime(workDuration);
     completedBlocksDisplay.textContent = `Blocks: 0`;
-    
-    // Set initial background
-    vistaBg.style.filter = 'blur(0px) grayscale(0) brightness(1)';
 };
 
 // Make sure we handle window close to avoid memory leaks
@@ -109,4 +102,46 @@ window.addEventListener('beforeunload', () => {
     if (intervalId) {
         clearInterval(intervalId);
     }
+});
+
+// Install Button Logic
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    
+    // Stash the event so it can be triggered later.
+    deferredPrompt = e;
+    
+    // Update UI to notify the user they can add to home screen
+    const installButton = document.getElementById('install-button');
+    installButton.style.display = 'block';
+});
+
+const installButton = document.getElementById('install-button');
+if (installButton) {
+    installButton.addEventListener('click', () => {
+        // Hide the app provided install promotion
+        installButton.style.display = 'none';
+        
+        // Show the install prompt
+        deferredPrompt.prompt();
+        
+        // Wait for the user to respond to the prompt
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted the A2HS prompt');
+            } else {
+                console.log('User dismissed the A2HS prompt');
+            }
+            
+            // Reset the deferred prompt variable
+            deferredPrompt = null;
+        });
+    });
+}
+
+window.addEventListener('appinstalled', (evt) => {
+    console.log('INSTALL EVENT TRIGGERED!');
 });
