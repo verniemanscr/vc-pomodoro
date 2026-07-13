@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pomodoro Timer</title>
     <!-- Manifest Link -->
-    <link rel="manifest" href="manifest.json"> <!-- No trailing slash for file -->
+    <link rel="manifest" href="/vc-pomodoro/manifest.json"> <!-- No trailing slash for file -->
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="style.css"> <!-- No trailing slash for file -->
+    <link rel="stylesheet" href="/vc-pomodoro/style.css"> <!-- No trailing slash for file -->
     <!-- Fontawesome for icons (optional) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -43,7 +43,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js') // No trailing slash for file
+                navigator.serviceWorker.register('/vc-pomodoro/sw.js') // No trailing slash for file
                     .then(registration => {
                         console.log('Service Worker registered:', registration);
                     })
@@ -55,6 +55,6 @@
     </script>
 
     <!-- Main JavaScript -->
-    <script src="main.js"></script> <!-- No trailing slash for file -->
+    <script src="/vc-pomodoro/main.js"></script> <!-- No trailing slash for file -->
 </body>
 </html>
