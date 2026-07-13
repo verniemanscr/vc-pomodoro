@@ -4,54 +4,340 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pomodoro Timer</title>
-    <!-- Manifest Link -->
     <link rel="manifest" href="manifest.json">
-    <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css">
-    <!-- Fontawesome for icons (optional) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
-    <div id="pomodoro-container">
-        <div id="timer-display">
-            <svg class="circle-timer" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="45" class="circle-background" />
-                <circle cx="50" cy="50" r="45" class="circle-progress" />
-                <text id="timer-time" x="50" y="50" text-anchor="middle" dy=".3em">25:00</text>
-            </svg>
-        </div>
-        <div class="controls">
-            <button id="start-pause-btn" class="btn">Start</button>
-            <button id="skip-btn" class="btn skip">Skip Block</button>
-        </div>
-        <div class="stats">
-            <p id="completed-blocks">Blocks: 0</p>
-        </div>
-    </div>
-
-    <!-- Install Button (hidden by default) -->
-    <div id="install-button-container" style="display:none;">
-        <button id="install-button" class="btn install-btn">
-            ⚡ Add to Home Screen
-        </button>
-    </div>
-
-    <!-- Service Worker Registration -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script>
+        // Service Worker registration (for browser detection)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('sw.js')
                     .then(registration => {
                         console.log('Service Worker registered:', registration);
                     })
                     .catch(error => {
-                        console.error('Service Worker registration failed:', error);
+                        console.log('Service Worker registration failed:', error);
                     });
             });
         }
     </script>
+</head>
+<body>
+    <div id="vista-bg"></div>
+    <div id="pomodoro-container">
+        <div id="pomodoro-timer">
+            <div class="timer-progress-container">
+                <svg class="circle-timer" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" class="circle-background" />
+                    <circle cx="50" cy="50" r="45" class="circle-progress" />
+                    <text id="timer-time" x="50" y="50" text-anchor="middle" dy=".3em" font-size="18" font-family="Roboto">25:00</text>
+                </svg>
+            </div>
+            <div class="timer-controls">
+                <button id="start-pause-btn" class="btn">Start</button>
+                <button id="skip-btn" class="btn skip">Skip Block</button>
+            </div>
+            <div class="stats">
+                <p id="completed-blocks">Blocks: 0</p>
+            </div>
+        </div>
+    </div>
 
-    <!-- Main JavaScript -->
-    <script src="main.js"></script>
+    <div id="install-button-container">
+        <button id="install-button" class="install-btn">
+            ⚡ Add to Home Screen
+        </button>
+    </div>
+
+    <script>
+        // Timer variables
+        let workDuration = 25 * 60; // 25 minutes in seconds
+        let restDuration = 5 * 60; // 5 minutes in seconds
+        let remainingTime = workDuration;
+        let isPaused = true;
+        let isWorking = true;
+        let intervalId;
+        let completedBlocks = 0;
+
+        // DOM elements
+        const timerTime = document.getElementById('timer-time');
+        const startPauseBtn = document.getElementById('start-pause-btn');
+        const skipBtn = document.getElementById('skip-btn');
+        const completedBlocksDisplay = document.getElementById('completed-blocks');
+        const vistaBg = document.getElementById('vista-bg');
+        const circleProgress = document.querySelector('.circle-progress');
+
+        // Format time to MM:SS
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+        }
+
+        // Update timer display and progress bar
+        function updateTimer() {
+            if (isPaused) return;
+
+            remainingTime--;
+
+            // Update timer display
+            timerTime.textContent = formatTime(remainingTime);
+
+            // Check if timer has finished
+            if (remainingTime <= 0) {
+                isWorking = !isWorking;
+                remainingTime = isWorking ? workDuration : restDuration;
+                
+                // Update visual feedback
+                if (!isWorking) {
+                    vistaBg.style.filter = 'blur(5px) grayscale(0.6) brightness(0.5)';
+                    completedBlocks++;
+                    completedBlocksDisplay.textContent = `Blocks: ${completedBlocks}`;
+                    
+                    // Check if we need a long break (every 4 blocks)
+                    if (completedBlocks % 4 === 0) {
+                        // Show long break notification
+                        alert(`🎉 Long break time! Take a 15-minute break!`);
+                    }
+                } else {
+                    vistaBg.style.filter = 'blur(0px) grayscale(0) brightness(1)';
+                }
+
+                // Pause timer after reset
+                isPaused = true;
+                startPauseBtn.textContent = 'Start';
+            }
+
+            // Update the progress bar
+            const radius = 45;
+            const circumference = 2 * Math.PI * radius;
+            const totalDuration = isWorking ? workDuration : restDuration;
+            const dashOffset = circumference * remainingTime / totalDuration;
+            
+            // Apply the new dash offset
+            circleProgress.style.strokeDashoffset = dashOffset;
+        }
+
+        // Start/Stop timer
+        startPauseBtn.addEventListener('click', () => {
+            isPaused = !isPaused;
+            
+            if (isPaused) {
+                startPauseBtn.textContent = 'Start';
+                if (intervalId) clearInterval(intervalId);
+                intervalId = null;
+            } else {
+                startPauseBtn.textContent = 'Pause';
+                if (!intervalId) {
+                    intervalId = setInterval(updateTimer, 1000);
+                }
+            }
+        });
+
+        // Skip current block
+        skipBtn.addEventListener('click', () => {
+            if (isWorking) {
+                // Skip work block
+                isWorking = false;
+                remainingTime = restDuration;
+                vistaBg.style.filter = 'blur(5px) grayscale(0.6) brightness(0.5)';
+                completedBlocks++;
+                completedBlocksDisplay.textContent = `Blocks: ${completedBlocks}`;
+                
+                // Check if we need a long break (every 4 blocks)
+                if (completedBlocks % 4 === 0) {
+                    // Show long break notification
+                    alert(`🎉 Long break time! Take a 15-minute break!`);
+                }
+                
+                startPauseBtn.textContent = 'Pause';
+                intervalId = setInterval(updateTimer, 1000);
+            } else {
+                // Skip break block
+                isWorking = true;
+                remainingTime = workDuration;
+                vistaBg.style.filter = 'blur(0px) grayscale(0) brightness(1)';
+                completedBlocks++;
+                completedBlocksDisplay.textContent = `Blocks: ${completedBlocks}`;
+                
+                startPauseBtn.textContent = 'Pause';
+                intervalId = setInterval(updateTimer, 1000);
+            }
+        });
+
+        // Initialize timer
+        window.onload = () => {
+            // Set initial state
+            startPauseBtn.textContent = 'Start';
+            timerTime.textContent = formatTime(workDuration);
+            completedBlocksDisplay.textContent = `Blocks: 0`;
+            
+            // Set initial background
+            vistaBg.style.filter = 'blur(0px) grayscale(0) brightness(1)';
+            
+            // Initialize the progress bar (optional - just in case)
+            const radius = 45;
+            const circumference = 2 * Math.PI * radius;
+            const dashOffset = circumference * workDuration / workDuration;
+            circleProgress.style.strokeDashoffset = dashOffset;
+        };
+
+        // Add PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registered:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+
+        // Make sure we handle window close to avoid memory leaks
+        window.addEventListener('beforeunload', () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        });
+
+        // Custom install button
+        document.addEventListener('DOMContentLoaded', () => {
+            const installButton = document.getElementById('install-button');
+            
+            if ('serviceWorker' in navigator) {
+                installButton.addEventListener('click', () => {
+                    if (navigator.serviceWorker.controller) {
+                        // If we have a service worker, we can install
+                        navigator.serviceWorker.ready.then(registration => {
+                            // Show the install prompt
+                            registration.active.postMessage({ type: 'install' });
+                        });
+                    } else {
+                        // If no service worker, we need to register one
+                        navigator.serviceWorker.register('sw.js').then(() => {
+                            // After registration, try again
+                            setTimeout(() => {
+                                installButton.click();
+                            }, 1000);
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- Service Worker -->
+    <script type="module">
+        // Service Worker code goes here
+        const CACHE_NAME = 'pomodoro-v1';
+        const ASSETS_TO_CACHE = [
+            '/',
+            '/index.html',
+            '/style.css',
+            '/main.js',
+            '/manifest.json',
+            '/icons/icon-192.png',
+            '/icons/icon-512.png'
+        ];
+
+        // Install event - cache the app shell
+        self.addEventListener('install', (event) => {
+            event.waitUntil(
+                caches.open(CACHE_NAME).then((cache) => {
+                    return cache.addAll(ASSETS_TO_CACHE);
+                })
+            );
+            
+            self.skipWaiting();
+        });
+
+        // Activate event - clean up old caches
+        self.addEventListener('activate', (event) => {
+            event.waitUntil(
+                caches.keys().then((cacheNames) => {
+                    return Promise.all(
+                        cacheNames
+                            .filter((name) => name !== CACHE_NAME)
+                            .map((name) => caches.delete(name))
+                    );
+                })
+            );
+            
+            self.clients.claim();
+        });
+
+        // Fetch event - serve cached content first, then network
+        self.addEventListener('fetch', (event) => {
+            if (event.request.destination === 'image') {
+                event.respondWith(
+                    caches.match(event.request).then((cached) => {
+                        return cached || fetch(event.request).then((response) => {
+                            const clone = response.clone();
+                            caches.open(CACHE_NAME).then((cache) => {
+                                cache.put(event.request, clone);
+                            });
+                            return response;
+                        });
+                    })
+                );
+            }
+        });
+    </script>
+
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons (inline for simplicity) -->
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAASdEVYdFNvZnR3YXJlAEFjY291bnRzLm9yZgAAAPJzUk5JQAAAAABJRU5ErkJggg==" sizes="192x192">
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAASdEVYdFNvZnR3YXJlAEFjY291bnRzLm9yZgAAAPJzUk5JQAAAAABJRU5ErkJggg==" sizes="512x512">
+    
+    <!-- Custom icons -->
+    <script>
+        // Create custom icons if needed
+        const icons = {
+            "192x192": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAASdEVYdFNvZnR3YXJlAEFjY291bnRzLm9yZgAAAPJzUk5JQAAAAABJRU5ErkJggg==",
+            "512x512": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAASdEVYdFNvZnR3YXJlAEFjY291bnRzLm9yZgAAAPJzUk5JQAAAAABJRU5ErkJggg=="
+        };
+
+        // Add icons to manifest
+        const manifest = {
+            name: "Pomodoro Timer",
+            short_name: "Pomodoro",
+            description: "A simple Pomodoro timer that helps you focus with 25-minute work sessions and 5-minute breaks",
+            start_url: "/",
+            scope: "/",
+            display: "standalone",
+            background_color: "#ffffff",
+            theme_color: "#6a11cb",
+            icons: [
+                {
+                    src: icons["192x192"],
+                    sizes: "192x192",
+                    type: "image/png"
+                },
+                {
+                    src: icons["512x512"],
+                    sizes: "512x512",
+                    type: "image/png"
+                },
+                {
+                    src: icons["512x512"],
+                    sizes: "512x512",
+                    type: "image/png",
+                    purpose: "maskable"
+                }
+            ]
+        };
+
+        // Add to manifest.json
+        const manifestFile = document.createElement('script');
+        manifestFile.type = 'application/manifest+json';
+        manifestFile.textContent = JSON.stringify(manifest);
+        document.head.appendChild(manifestFile);
+    </script>
 </body>
 </html>
