@@ -5,116 +5,94 @@
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
-    padding: 20px;
-    position: relative;
-}
-
-#vista-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('https://source.unsplash.com/random/1920x1080/?nature') center/cover no-repeat;
-    opacity: 0.6;
-    z-index: -1;
-    filter: blur(5px) grayscale(0.6) brightness(0.5);
-    transition: opacity 0.3s ease;
+    min-height: 100vh;
+    background-color: #f0f8ff; /* Light blue background */
+    font-family: 'Roboto', sans-serif;
+    color: #333;
 }
 
 #pomodoro-container {
+    text-align: center;
     max-width: 400px;
     width: 100%;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    z-index: 1;
+    padding: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: white;
 }
 
-.timer-progress-container {
-    margin: 20px auto;
-    width: 100px;
-    height: 100px;
+#timer-display {
+    margin-bottom: 20px;
     position: relative;
 }
 
 .circle-timer {
-    width: 100%;
-    height: 100%;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
 }
 
 .circle-background {
     fill: none;
-    stroke: #333;
-    stroke-width: 10;
+    stroke: #ddd;
+    stroke-width: 8;
+}
+
+.circle-progress {
+    fill: none;
+    stroke: #6a11cb;
+    stroke-width: 8;
+    transform: rotate(-90deg);
+    transform-origin: center;
 }
 
 #timer-time {
     font-size: 24px;
     font-weight: bold;
-    fill: white; /* Ensure text color is visible */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
-.timer-controls {
-    margin: 20px 0;
+.controls {
+    margin-bottom: 10px;
 }
 
 .btn {
     padding: 12px 24px;
-    margin: 0 10px;
+    margin: 0 5px;
     font-size: 16px;
-    font-weight: 700;
+    color: white;
+    background-color: #6a11cb;
     border: none;
-    border-radius: 25px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: inherit;
-    background-color: #fff;
-    color: #6a11cb;
+    transition: background-color 0.3s;
 }
 
 .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-}
-
-.btn:active {
-    transform: translateY(0);
+    background-color: #5282e5;
 }
 
 .skip {
-    background-color: #e0e0e0;
-    color: #333;
+    background-color: #f44336;
 }
 
 .skip:hover {
-    background-color: #d0d0d0;
+    background-color: #d32f2f;
 }
 
 .stats {
-    margin-top: 20px;
     font-size: 14px;
-    color: white; /* Ensure text color is visible */
 }
 
-@media (max-width: 480px) {
-    #pomodoro-container {
-        padding: 20px;
-    }
-    
-    .btn {
-        padding: 10px 20px;
-        font-size: 14px;
-    }
+/* Install Button Styling */
+.install-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+    margin-top: 20px;
 }
