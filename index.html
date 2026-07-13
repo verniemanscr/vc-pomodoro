@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="vista-bg"></div>
+    <div id="pomodoro-container">
+        <div id="pomodoro-timer">
+            <div class="timer-progress-container">
+                <svg class="circle-timer" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" class="circle-background" />
+                    <circle cx="50" cy="50" r="45" class="circle-progress" />
+                    <text id="timer-time" x="50" y="50" text-anchor="middle" dy=".3em" font-size="18" font-family="Roboto">25:00</text>
+                </svg>
+            </div>
+            <div class="timer-controls">
+                <button id="start-pause-btn" class="btn">Start</button>
+                <button id="skip-btn" class="btn skip">Skip Block</button>
+            </div>
+            <div class="stats">
+                <p id="completed-blocks">Blocks: 0</p>
+            </div>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
